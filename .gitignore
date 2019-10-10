@@ -1,0 +1,6 @@
+credentials.json
+/packages/
+/.vs/
+/GameDevLogin/bin/
+/GameDevLogin/obj/
+/GameDevLogin/credentials.json
