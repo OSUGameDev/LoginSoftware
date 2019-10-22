@@ -125,7 +125,7 @@ namespace GameDevLogin
                     logins.Add(new LoginToken()
                     {
                         row = i + 2,
-                        id = int.Parse(values[i][0] as string),
+                        id = Int64.Parse(values[i][0] as string),
                         name = values[i][1] as string,
                         CreationDate = DateTime.Parse(values[i][2] as string)
                     });
@@ -146,7 +146,7 @@ namespace GameDevLogin
         /// </summary>
         /// <param name="id">Id of the suer</param>
         /// <returns></returns>
-        private static LoginToken GetLoginToken(int id)
+        private static LoginToken GetLoginToken(Int64 id)
         {
             return cachedTokens.FirstOrDefault(value => value.id == id) 
                 ?? GetLoginTokens().FirstOrDefault(value => value.id == id);
@@ -157,7 +157,7 @@ namespace GameDevLogin
         /// </summary>
         /// <param name="id">Id of the user</param>
         /// <returns>username or error</returns>
-        public static Errorable<string> Login(int id)
+        public static Errorable<string> Login(Int64 id)
         {
             //get the users login token
             LoginToken token = GetLoginToken(id);
@@ -224,7 +224,7 @@ namespace GameDevLogin
         /// <param name="id">Id of the user</param>
         /// <param name="username">Username</param>
         /// <returns>If the user was registered</returns>
-        public static bool register(int id, string username)
+        public static bool register(Int64 id, string username)
         {
             //check that the user is not in the list
             List<LoginToken> tokens = GetLoginTokens();
@@ -243,7 +243,7 @@ namespace GameDevLogin
             // Formatt the user data
             IList<IList<object>> data = new List<IList<object>>();
             data.Add(new List<object>());
-            data[0].Add($"{id:D9}");
+            data[0].Add($"{id}");
             data[0].Add(username);
             data[0].Add(DateTime.Now.ToString("yyyy/MM/dd"));
             List<ValueRange> ranges = new List<ValueRange>();
@@ -281,7 +281,7 @@ namespace GameDevLogin
         private class LoginToken
         {
             public int row;
-            public int id;
+            public Int64 id;
             public string name;
             public DateTime CreationDate;
         }

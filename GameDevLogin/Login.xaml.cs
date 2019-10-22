@@ -28,13 +28,13 @@ namespace GameDevLogin
 
         private void SubmitButtonPressed(object sender, RoutedEventArgs e)
         {
-            if(ManualIdField.Text.Length == 9 && Int32.TryParse(ManualIdField.Text, out var id))
+            if(ManualIdField.Text.Length == 9 && Int64.TryParse(ManualIdField.Text, out var id))
             {
                 MagReaderHelper_IdRead(id);
             }
         }
 
-        private void MagReaderHelper_IdRead(Int32 id)
+        private void MagReaderHelper_IdRead(Int64 id)
         {
             //check that this form is the active one
             if (!IsVisible)

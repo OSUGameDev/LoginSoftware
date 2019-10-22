@@ -13,6 +13,8 @@ namespace GameDevLogin
 {
     static class MagReaderHelper
     {
+        public static Regex IdRegex = new Regex(MainSettings.Default.MagstripRegex);
+
         /// <summary>
         /// inizalizes the mag strip reader
         /// </summary>
@@ -23,11 +25,11 @@ namespace GameDevLogin
             onEnter += (s) =>
             {
                 //Use regular expressions to search for an id in the magnetic strip
-                Regex reg = new Regex(@"\;(\d{9})(=\d{4})?\?\n");
-                var mat = reg.Match(s);
+                
+                var mat = IdRegex.Match(s);
                 if (mat.Success && ReadingCards)
                 {
-                    IdRead?.Invoke(Int32.Parse(mat.Groups[1].Value));
+                    IdRead?.Invoke(Int64.Parse(mat.Groups[1].Value));
                 }
             };
         }
@@ -35,7 +37,7 @@ namespace GameDevLogin
         /// <summary>
         /// Action to be called whenever an ID has been read off of a magstrip
         /// </summary>
-        public static event Action<int> IdRead;
+        public static event Action<Int64> IdRead;
 
         /// <summary>
         /// If the reader should be looking for IDs

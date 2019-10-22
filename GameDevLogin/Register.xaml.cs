@@ -22,15 +22,15 @@ namespace GameDevLogin
         /// Notify the register page that the mag strip reader has read a magstrim
         /// </summary>
         /// <param name="id">Id stored on the magnetic strip</param>
-        private void MagReaderHelper_IdRead(Int32 id)
+        private void MagReaderHelper_IdRead(Int64 id)
         {
             if (!this.IsVisible)
                 return;
-            IdInputField.Text = $"{id:D9}";
+            IdInputField.Text = $"{id}";
             if(NameInputField.IsFocused)
             {
-                Regex reg = new Regex(@"\;(\d{9})(=\d{4})?\?");
-                var match = reg.Match(NameInputField.Text);
+              
+                var match = MagReaderHelper.IdRegex.Match(NameInputField.Text);
                 if(match.Success)
                 {
                     NameInputField.Text = NameInputField.Text.Remove(match.Index, match.Length);
