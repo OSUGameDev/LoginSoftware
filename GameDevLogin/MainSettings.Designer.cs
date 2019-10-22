@@ -34,5 +34,17 @@ namespace GameDevLogin {
                 this["MagstripRegex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowUnsafeCheckin {
+            get {
+                return ((bool)(this["AllowUnsafeCheckin"]));
+            }
+            set {
+                this["AllowUnsafeCheckin"] = value;
+            }
+        }
     }
 }

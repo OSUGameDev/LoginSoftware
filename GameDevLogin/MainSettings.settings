@@ -5,5 +5,8 @@
     <Setting Name="MagstripRegex" Type="System.String" Scope="User">
       <Value Profile="(Default)">\;(\d{9})\d*(=\d{4})?\?\n</Value>
     </Setting>
+    <Setting Name="AllowUnsafeCheckin" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

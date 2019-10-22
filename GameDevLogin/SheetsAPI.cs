@@ -11,6 +11,9 @@ using Google.Apis.Util.Store;
 using Google.Apis.Services;
 using System.Runtime.Serialization.Formatters.Binary;
 using Google.Apis.Sheets.v4.Data;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Windows;
 
 namespace GameDevLogin
 {
@@ -164,32 +167,56 @@ namespace GameDevLogin
             if(token == null)
                 return new Errorable<string>("Login not found", true);
 
-            //get the title of the sheet
-            var spreadSheet = Service.Spreadsheets.Get(info.SheetId).Execute();
-            string sheetTitle = spreadSheet.Sheets[0].Properties.Title;
-
-            //find the latest date
-            var response = Service.Spreadsheets.Values.Get(info.SheetId, $"{sheetTitle}!1:1").Execute();
-            int column = response.Values[0].Count;
-            string columnName = IntToColumn(column-1);
-
-            //udapte the cells
-            response = Service.Spreadsheets.Values.Get(info.SheetId, $"{sheetTitle}!{columnName}1").Execute();
-            if (!(response.Values.Count == 1 && response.Values[0].Count == 1))
-                return new Errorable<string>("Error on getting sheet info", true);
-            if(0 == string.Compare(response.Values[0][0] as string,DateTime.Now.ToString("yyyy/MM/dd"))
-                || 0 == string.Compare(response.Values[0][0] as string, DateTime.Now.ToString("yyyy-MM-dd")))
+            Task<Errorable<string>> updateTask = new Task<Errorable<string>>(() =>
             {
-                updateValue("1", $"{sheetTitle}!{columnName}{token.row}");
+                //get the title of the sheet
+                var spreadSheet = Service.Spreadsheets.Get(info.SheetId).Execute();
+                string sheetTitle = spreadSheet.Sheets[0].Properties.Title;
+
+                //find the latest date
+                var response = Service.Spreadsheets.Values.Get(info.SheetId, $"{sheetTitle}!1:1").Execute();
+                int column = response.Values[0].Count;
+                string columnName = IntToColumn(column - 1);
+
+                //udapte the cells
+                response = Service.Spreadsheets.Values.Get(info.SheetId, $"{sheetTitle}!{columnName}1").Execute();
+                if (!(response.Values.Count == 1 && response.Values[0].Count == 1))
+                    return new Errorable<string>("Error on getting sheet info", true);
+                if (0 == string.Compare(response.Values[0][0] as string, DateTime.Now.ToString("yyyy/MM/dd"))
+                    || 0 == string.Compare(response.Values[0][0] as string, DateTime.Now.ToString("yyyy-MM-dd")))
+                {
+                    updateValue("1", $"{sheetTitle}!{columnName}{token.row}");
+                }
+                else
+                {
+                    columnName = IntToColumn(column);
+                    updateValue(DateTime.Now.ToString("yyyy/MM/dd"), $"{sheetTitle}!{columnName}1");
+                    updateValue("1", $"{sheetTitle}!{columnName}{token.row}");
+
+                }
+                return new Errorable<string>(token.name);
+            });
+            updateTask.Start();
+            if (MainSettings.Default.AllowUnsafeCheckin)
+            {
+                updateTask.ContinueWith(item =>
+                {
+                    if (item.Result.isErrored)
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show($"{item.Result.ErrorMessage}:{token.name}:{token.id}", "Error Logging in", MessageBoxButton.OK);
+                        });
+                        
+
+                });
+                return new Errorable<string>(token.name);
             }
             else
             {
-                columnName = IntToColumn(column);
-                updateValue(DateTime.Now.ToString("yyyy/MM/dd"), $"{sheetTitle}!{columnName}1");
-                updateValue("1", $"{sheetTitle}!{columnName}{token.row}");
-
+                updateTask.Wait();
+                return updateTask.Result;
             }
-            return new Errorable<string>(token.name);
+            
         }
 
         /// <summary>
